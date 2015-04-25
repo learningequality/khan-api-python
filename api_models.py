@@ -144,6 +144,7 @@ class APIModel(AttrDict):
         self._related_field_types = {}
         self._lazy_related_field_types = {}
         self._API_attributes = {}
+        self._api_version = "v1"
 
     def API_url(self, name):
         """
@@ -160,7 +161,7 @@ class APIModel(AttrDict):
 
     def fetch(self):
         self.update(api_call(
-            "v1", self.base_url + "/" + self[kind_to_id_map.get(type(self).__name__, "id")], self._session))
+            self._api_version, self.base_url + "/" + self[kind_to_id_map.get(type(self).__name__, "id")], self._session))
         self._loaded = True
 
     def toJSON(self):
@@ -645,6 +646,13 @@ class Separator(APIModel):
 
 class Scratchpad(APIModel):
     base_url = "/scratchpads"
+
+
+    def __init__(self, *args, **kwargs):
+
+        super(Scratchpad, self).__init__(*args, **kwargs)
+        
+        self._api_version = "internal"
 
 
 
