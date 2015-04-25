@@ -345,7 +345,7 @@ class Khan():
                     item_nodes[child["id"]] = child
         recurse_nodes(topic_tree)
 
-        return self.convert_list_to_classes(item_nodes.values())
+        return self.convert_list_to_classes(item_nodes.values(), loaded=False)
 
     def get_exercises(self):
         """
