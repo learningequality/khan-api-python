@@ -444,6 +444,12 @@ class Khan():
         """
         return self.convert_list_to_classes(api_call("v1", Tag.base_url + self.params(), self), class_converter=Tag)
 
+    def get_scratchpad(self, scratchpad_id):
+        """
+        Return particular Scratchpad, by "scratchpad_id"
+        """
+        return Scratchpad(api_call("internal", Scratchpad.base_url + "/" + scratchpad_id + self.params(), self), session=self)
+
 class Exercise(APIModel):
 
     base_url = "/exercises"
@@ -626,7 +632,8 @@ class Separator(APIModel):
 
 
 class Scratchpad(APIModel):
-    pass
+    base_url = "/scratchpads"
+
 
 
 class Article(APIModel):
