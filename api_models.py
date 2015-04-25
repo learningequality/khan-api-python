@@ -323,6 +323,30 @@ class Khan():
         else:
             return ""
 
+    def get_items(self, kind):
+        """
+        As no list API endpoint is provided for several content types by Khan Academy, this function fetches the topic tree,
+        and recurses all the nodes in order to find all the content of a certain type in the topic tree.
+        """
+        topic_tree = self.get_topic_tree()
+
+        item_nodes = {}
+
+        def recurse_nodes(node):
+            
+            # Do the recursion
+            for child in node.get("children", []):
+                recurse_nodes(child)
+
+            for child in node.get("child_data", []):
+                # Add the item to the item nodes
+                child_kind = child["kind"]
+                if child["id"] not in item_nodes and child_kind==kind:
+                    item_nodes[child["id"]] = child
+        recurse_nodes(topic_tree)
+
+        return self.convert_list_to_classes(item_nodes.values())
+
     def get_exercises(self):
         """
         Return list of all exercises in the Khan API
@@ -393,26 +417,8 @@ class Khan():
     def get_videos(self):
         """
         Return list of all videos.
-        As no API endpoint is provided for this by Khan Academy, this function fetches the topic tree,
-        and recurses all the nodes in order to find all the videos in the topic tree.
         """
-        topic_tree = self.get_topic_tree()
-
-        video_nodes = {}
-
-        def recurse_nodes(node):
-            # Add the video to the video nodes
-            kind = node["kind"]
-            
-            if node["id"] not in video_nodes and kind=="Video":
-                video_nodes[node["id"]] = node
-
-            # Do the recursion
-            for child in node.get("children", []):
-                recurse_nodes(child)
-        recurse_nodes(topic_tree)
-
-        return self.convert_list_to_classes(video_nodes.values())
+        return self.get_items("Video")
 
     def get_playlists(self):
         """
@@ -449,6 +455,12 @@ class Khan():
         Return particular Scratchpad, by "scratchpad_id"
         """
         return Scratchpad(api_call("internal", Scratchpad.base_url + "/" + scratchpad_id + self.params(), self), session=self)
+
+    def get_scratchpads(self):
+        """
+        Return all Scratchpads, lazily loaded
+        """
+        return self.get_items("Scratchpad")
 
 class Exercise(APIModel):
 
