@@ -1,4 +1,5 @@
 import requests
+import urllib
 import json
 import cgi
 import os
@@ -318,11 +319,11 @@ class Khan():
             self.convert_list_to_classes(obj[
                 name], class_converter=class_converter, loaded=loaded)
 
-    def params(self):
+    def params(self, **kwargs):
         if self.lang:
-            return "?lang=" + self.lang
-        else:
-            return ""
+            kwargs["lang"] = self.lang
+        paramstring = urllib.urlencode(kwargs)
+        return "?" + paramstring if paramstring else ""
 
     def get_items(self, kind):
         """
@@ -455,7 +456,7 @@ class Khan():
         """
         Return particular Scratchpad, by "scratchpad_id"
         """
-        return Scratchpad(api_call("internal", Scratchpad.base_url + "/" + scratchpad_id + self.params(), self), session=self)
+        return Scratchpad(api_call("internal", Scratchpad.base_url + self.params(scratchpad_id=scratchpad_id, projection='{"scratchpad":true}'), self), session=self)
 
     def get_scratchpads(self):
         """
@@ -645,7 +646,7 @@ class Separator(APIModel):
 
 
 class Scratchpad(APIModel):
-    base_url = "/scratchpads"
+    base_url = "/show_scratchpad"
 
 
     def __init__(self, *args, **kwargs):
@@ -653,6 +654,10 @@ class Scratchpad(APIModel):
         super(Scratchpad, self).__init__(*args, **kwargs)
         
         self._api_version = "internal"
+
+        data = self.pop("scratchpad", {})
+
+        self.update(data)
 
 
 
