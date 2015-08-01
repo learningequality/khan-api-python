@@ -7,7 +7,6 @@ import SocketServer
 import SimpleHTTPServer
 import sys
 import copy
-from decorator import decorator
 from functools import partial
 
 try:
