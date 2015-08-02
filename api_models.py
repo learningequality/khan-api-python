@@ -324,7 +324,7 @@ class Khan():
         paramstring = urllib.urlencode(kwargs)
         return "?" + paramstring if paramstring else ""
 
-    def get_items(self, kind):
+    def get_items(self, kind, child_key="child_data"):
         """
         As no list API endpoint is provided for several content types by Khan Academy, this function fetches the topic tree,
         and recurses all the nodes in order to find all the content of a certain type in the topic tree.
@@ -339,7 +339,7 @@ class Khan():
             for child in node.get("children", []):
                 recurse_nodes(child)
 
-            for child in node.get("child_data", []):
+            for child in node.get(child_key, []):
                 # Add the item to the item nodes
                 child_kind = child["kind"]
                 if child["id"] not in item_nodes and child_kind==kind:
@@ -419,7 +419,7 @@ class Khan():
         """
         Return list of all videos.
         """
-        return self.get_items("Video")
+        return self.get_items("Video", child_key="children")
 
     def get_playlists(self):
         """
